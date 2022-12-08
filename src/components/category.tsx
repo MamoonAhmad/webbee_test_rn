@@ -1,7 +1,6 @@
 import React, {
   PropsWithChildren,
   useCallback,
-  useContext,
   useEffect,
   useRef,
   useState,
@@ -16,12 +15,11 @@ import {
 import {DataTypeInString} from '../utils/data-types';
 import SelectDropdown from 'react-native-select-dropdown';
 import tw from 'twrnc';
-import {Context} from '../context/context';
-import {connect, useDispatch, useSelector} from 'react-redux';
-import {bindActionCreators} from 'redux';
+
+import {useDispatch, useSelector} from 'react-redux';
 import {addCategory, deleteCategory, updateCategory} from '../store/store';
 
-type ObjectInArray = {key: number};
+type ObjectInArray = {key: string};
 
 type UseArrayOfObjectsType<T extends ObjectInArray> = {
   objects: T[];
@@ -30,13 +28,18 @@ type UseArrayOfObjectsType<T extends ObjectInArray> = {
   onAdd: (obj: Omit<T, 'key'>) => void;
   init: (objs: T[]) => void;
 };
-export const useArrayOfObjects: <
-  T extends ObjectInArray,
->() => UseArrayOfObjectsType<T> = () => {
+export const useArrayOfObjects: <T extends ObjectInArray>(
+  initialData: ObjectInArray[],
+) => UseArrayOfObjectsType<T> = initialData => {
   const [objects, setObjects] = useState<ObjectInArray[]>([]);
   const keyRef = useRef(1);
-  const objectsRef = useRef<ObjectInArray[]>([]);
+  const objectsRef = useRef<ObjectInArray[]>(initialData || []);
 
+  useEffect(() => {
+    if (objects !== initialData && objectsRef.current === initialData) {
+      setObjects(objectsRef.current);
+    }
+  }, [initialData, objects]);
   const onChange = useCallback((obj: ObjectInArray) => {
     const {key} = obj;
     const attribute: ObjectInArray = objectsRef.current.find(
@@ -61,15 +64,14 @@ export const useArrayOfObjects: <
   }, []);
 
   const onAdd = useCallback((obj: ObjectInArray) => {
-    keyRef.current++;
-    objectsRef.current?.push({...obj, key: keyRef.current});
+    objectsRef.current?.push({...obj, key: new Date().getTime().toString()});
     objectsRef.current = [...objectsRef.current];
     setObjects(objectsRef.current);
   }, []);
 
   const init = useCallback((objs: ObjectInArray[]) => {
     objectsRef.current = [...objs];
-    objectsRef.current.forEach(o => (o.key = keyRef.current++));
+    objectsRef.current.forEach(o => (o.key = new Date().getTime().toString()));
     setObjects(objectsRef.current);
   }, []);
 
@@ -153,8 +155,8 @@ export const Category: React.FC<PropsWithChildren<CategoryProps>> = ({
     onAdd,
     onChange,
     onDelete,
-  } = useArrayOfObjects<AttributeType>();
-
+  } = useArrayOfObjects<AttributeType>(category.attributes);
+  console.log(category, 'this is category');
   useEffect(() => {
     onCategoryChange({...category, attributes});
   }, [attributes]);

@@ -1,5 +1,8 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Alert} from 'react-native';
 import {combineReducers} from 'redux';
+import persistReducer from 'redux-persist/es/persistReducer';
+import autoMergeLevel2 from 'redux-persist/es/stateReconciler/autoMergeLevel2';
 import {CategoryType} from '../components/category';
 
 type StoreType = {
@@ -100,7 +103,7 @@ export const addCategory = (): ActionType => {
   return {
     type: 'ADD_CATEGORY',
     payload: {
-      name: 'Category',
+      name: 'Category' + new Date().getTime().toString(),
       key: new Date().getTime().toString(),
       attributes: [
         {
@@ -156,6 +159,12 @@ export const deleteCategoryObject = (obj: any) => {
   };
 };
 
+const persistConfig = {
+  key: 'categories',
+  storage: AsyncStorage,
+  whitelist: ['categories'],
+  stateReconciler: autoMergeLevel2,
+};
 export const categoryReducers = combineReducers({
   categories: categoryReducer,
   categoryObject: categoryObjectReducer,

@@ -87,8 +87,11 @@ const ObjectView: React.FC<P> = ({onChange, object, onDelete, category}) => {
   return (
     <View
       style={tw`flex flex-col bg-white border rounder m-3 border-gray-400 p-3`}>
+      <Text style={tw`text-xl font-semibold mb-5`}>
+        {object.value[category.title_attribute] || ''}
+      </Text>
       {Object.keys(object.value).map(name => {
-        const type = category?.attributes?.find(a => a.name === name)!.type;
+        const type = category?.attributes?.find(a => a.name === name);
         return (
           <View style={tw`flex mt-3`}>
             <Text style={tw`text-md font-semibold text-black my-1`}>
@@ -99,7 +102,8 @@ const ObjectView: React.FC<P> = ({onChange, object, onDelete, category}) => {
               name={name}
               value={object.value[name]}
               onChange={onChange}
-              type={type}
+              key={type?.key}
+              type={type?.type}
             />
           </View>
         );
@@ -128,6 +132,8 @@ const Field: React.FC<{
   object: ObjectType;
 }> = ({name, onChange, type, object, value}) => {
   const Comp = getComponentForDataType(type);
+
+  if (!Comp) return null;
 
   return (
     <Comp

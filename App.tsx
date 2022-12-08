@@ -35,12 +35,13 @@ import {persistStore, persistReducer} from 'redux-persist';
 
 import storage from 'redux-persist/lib/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-AsyncStorage.clear();
+import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
+// AsyncStorage.clear();
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['categories', 'categoryObjects'],
+  whitelist: ['categories', 'categoryObject'],
 };
 
 const Drawer = createDrawerNavigator();
@@ -79,17 +80,19 @@ const Nav = () => {
     <>
       <Drawer.Navigator initialRouteName="Home">
         <Drawer.Screen name="Manage Categories" component={Categories} />
-        {categories?.categories?.map(c => {
-          return (
-            <Drawer.Screen name={c.name}>
-              {() => (
-                <ScrollView>
-                  <CategoryObjectsView name={c.name} />
-                </ScrollView>
-              )}
-            </Drawer.Screen>
-          );
-        })}
+        {categories?.categories
+          ?.filter(c => !!c?.name)
+          ?.map(c => {
+            return (
+              <Drawer.Screen name={c.name}>
+                {() => (
+                  <ScrollView>
+                    <CategoryObjectsView name={c.name} />
+                  </ScrollView>
+                )}
+              </Drawer.Screen>
+            );
+          })}
         <Drawer.Screen name="Dashboard">
           {() => (
             <ScrollView>
