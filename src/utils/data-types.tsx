@@ -1,6 +1,7 @@
 import React, {PropsWithChildren} from 'react';
-import {TextInput} from 'react-native';
+import {Switch, TextInput} from 'react-native';
 import tw from 'twrnc';
+import DatePicker from 'react-native-date-picker';
 
 export const DATA_TYPES = {
   text: 'Text',
@@ -17,19 +18,21 @@ export interface DataTypeField<T> {
 
 type FieldType<T> = Omit<DataTypeField<T>, 'type'>;
 
-export const TextField: React.FC<FieldType<string>> = ({onChange}) => {
+export const TextField: React.FC<FieldType<string>> = ({onChange, value}) => {
   return (
     <TextInput
       style={tw`border border-blue-400 my-1 p-1 text-md`}
+      value={value}
       keyboardType="default"
       onChangeText={t => onChange(t)}
     />
   );
 };
 
-export const NumberField: React.FC<FieldType<number>> = ({onChange}) => {
+export const NumberField: React.FC<FieldType<number>> = ({onChange, value}) => {
   return (
     <TextInput
+      value={value?.toString()}
       style={tw`border border-blue-400 my-1 p-1 text-md`}
       keyboardType="decimal-pad"
       onChangeText={t => onChange(parseFloat(t))}
@@ -37,23 +40,21 @@ export const NumberField: React.FC<FieldType<number>> = ({onChange}) => {
   );
 };
 
-export const DateField: React.FC<FieldType<Date>> = ({onChange}) => {
+export const DateField: React.FC<FieldType<Date>> = ({onChange, value}) => {
   return (
-    <TextInput
+    <DatePicker
+      date={value}
       style={tw`border border-blue-400 my-1 p-1 text-md`}
-      keyboardType="default"
-      onChangeText={t => onChange(new Date(t))}
+      onDateChange={onChange}
     />
   );
 };
 
-export const CheckboxField: React.FC<PropsWithChildren<FieldType<boolean>>> = ({
-  children,
+export const CheckboxField: React.FC<FieldType<boolean>> = ({
   onChange,
+  value,
 }) => {
-  children;
-  onChange;
-  return null;
+  return <Switch value={value} onValueChange={v => onChange(v)} />;
 };
 
 export type CategoryName = string;

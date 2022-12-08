@@ -1,7 +1,6 @@
 import {Alert} from 'react-native';
 import {combineReducers} from 'redux';
 import {CategoryType} from '../components/category';
-let key = 1;
 
 type StoreType = {
   categories: CategoryType[];
@@ -102,8 +101,14 @@ export const addCategory = (): ActionType => {
     type: 'ADD_CATEGORY',
     payload: {
       name: 'Category',
-      key: key++,
-      attributes: [{key: 1, name: 'Field', type: 'text'}],
+      key: new Date().getTime().toString(),
+      attributes: [
+        {
+          key: new Date().getTime().toString(),
+          name: 'Category' + new Date().getTime().toString(),
+          type: 'text',
+        },
+      ],
       title_attribute: 'Field',
     },
   };
@@ -123,7 +128,11 @@ export const deleteCategory = (cat: CategoryType): ActionType => {
 };
 
 export const addCategoryObject = (cat: any) => {
-  const newObject: any = {key: key++, category: cat.name, value: {}};
+  const newObject: any = {
+    key: new Date().getTime().toString(),
+    category: cat.name,
+    value: {},
+  };
   cat?.attributes.forEach(a => {
     newObject.value[a.name] = null;
   });

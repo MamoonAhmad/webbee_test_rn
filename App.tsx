@@ -35,7 +35,7 @@ import {persistStore, persistReducer} from 'redux-persist';
 
 import storage from 'redux-persist/lib/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// AsyncStorage.clear();
+AsyncStorage.clear();
 
 const persistConfig = {
   key: 'root',

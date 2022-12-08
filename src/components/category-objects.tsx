@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import {Context} from '../context/context';
-import {useArrayOfObjects} from './category';
+import {CategoryType, useArrayOfObjects} from './category';
 import tw from 'twrnc';
 import {FlatList, Text, TouchableHighlight, View} from 'react-native';
 import {
@@ -24,6 +24,7 @@ export const CategoryObjectsView: React.FC<Props> = ({name}) => {
   const objects = useSelector(state => state.categoryObject);
   const dispatch = useDispatch();
   console.log(objects, 'this is obj');
+  const category = categories.categories.find(o => o?.name === name);
 
   return (
     <View style={tw`w-full flex flex-col p-2`}>
@@ -48,6 +49,7 @@ export const CategoryObjectsView: React.FC<Props> = ({name}) => {
           ?.filter(o => o.category === name)
           ?.map(o => (
             <ObjectView
+              category={category}
               onChange={co => dispatch(updateCategoryObject(co))}
               onDelete={co => dispatch(deleteCategoryObject(co))}
               object={o}
@@ -66,6 +68,7 @@ type P = {
   onChange: (attribute: ObjectType) => void;
   onDelete: (attribute: ObjectType) => void;
   object: ObjectType;
+  category: CategoryType;
 };
 
 const getComponentForDataType: (t: DataTypeInString) => React.FC = t => {
@@ -80,12 +83,12 @@ const getComponentForDataType: (t: DataTypeInString) => React.FC = t => {
   }
 };
 
-const ObjectView: React.FC<P> = ({onChange, object, onDelete}) => {
-  console.log(object, 'this is object');
+const ObjectView: React.FC<P> = ({onChange, object, onDelete, category}) => {
   return (
     <View
       style={tw`flex flex-col bg-white border rounder m-3 border-gray-400 p-3`}>
       {Object.keys(object.value).map(name => {
+        const type = category?.attributes?.find(a => a.name === name)!.type;
         return (
           <View style={tw`flex mt-3`}>
             <Text style={tw`text-md font-semibold text-black my-1`}>
@@ -94,8 +97,9 @@ const ObjectView: React.FC<P> = ({onChange, object, onDelete}) => {
             <Field
               object={object}
               name={name}
+              value={object.value[name]}
               onChange={onChange}
-              type="text"
+              type={type}
             />
           </View>
         );
@@ -119,9 +123,10 @@ const ObjectView: React.FC<P> = ({onChange, object, onDelete}) => {
 const Field: React.FC<{
   name: string;
   onChange: (attribute: ObjectType) => void;
+  value: any;
   type: DataTypeInString;
   object: ObjectType;
-}> = ({name, onChange, type, object}) => {
+}> = ({name, onChange, type, object, value}) => {
   const Comp = getComponentForDataType(type);
 
   return (
@@ -129,6 +134,7 @@ const Field: React.FC<{
       onChange={(t: any) =>
         onChange({...object, value: {...object.value, [name]: t}})
       }
+      value={value}
     />
   );
 };
