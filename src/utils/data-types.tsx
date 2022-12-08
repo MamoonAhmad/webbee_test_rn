@@ -1,4 +1,4 @@
-import React, {PropsWithChildren, useState} from 'react';
+import React, {useState} from 'react';
 import {Switch, Text, TextInput, View} from 'react-native';
 import tw from 'twrnc';
 import DatePicker from 'react-native-date-picker';
@@ -17,7 +17,7 @@ export interface DataTypeField<T> {
   type?: 'checkbox' | 'text' | 'number' | 'date';
 }
 
-type FieldType<T> = Omit<DataTypeField<T>, 'type'>;
+export type FieldType<T> = Omit<DataTypeField<T>, 'type'>;
 
 export const TextField: React.FC<FieldType<string>> = ({onChange, value}) => {
   return (
